@@ -6,6 +6,7 @@ Connect AI assistants (ChatGPT, Claude, Cursor, Windsurf, or any MCP-compatible 
 
 - **Website:** [obd-vault.com](https://obd-vault.com/)
 - **MCP Endpoint (Streamable HTTP):** `https://mcp.obd-vault.com/mcp`
+- **Claude Official Listing:** [OBD Vault on Claude Directory](https://claude.ai/directory/obd-vault)
 - **ChatGPT Official Listing:** [OBD Vault on ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6ade5eeb9e248191a75c718cc4c5cc20)
 - **Mobile App:** [Google Play (Android)](https://play.google.com/store/apps/details?id=com.obdvault.app) · [App Store (iPhone)](https://apps.apple.com/app/obd-vault/id6808813416)
 
@@ -24,10 +25,19 @@ Connect AI assistants (ChatGPT, Claude, Cursor, Windsurf, or any MCP-compatible 
 
 ## Connecting Your Client
 
+### Claude
+Use the official connector listing directly: [OBD Vault on Claude Directory](https://claude.ai/directory/obd-vault).
+
+For **Claude Code**, you can also add it from the terminal:
+
+```bash
+claude mcp add --transport http obd-vault https://mcp.obd-vault.com/mcp
+```
+
 ### ChatGPT
 Use the official listing directly: [OBD Vault in ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6ade5eeb9e248191a75c718cc4c5cc20).
 
-### Claude / Cursor / Windsurf / Generic Streamable HTTP MCP Client
+### Cursor / Windsurf / Generic Streamable HTTP MCP Client
 Configure a remote Streamable HTTP MCP server with OAuth 2.0 discovery:
 
 ```json
