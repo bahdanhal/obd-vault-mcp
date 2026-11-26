@@ -1,0 +1,463 @@
+{
+  "server": {
+    "name": "obd-vault",
+    "version": "0.1.0",
+    "protocolVersion": "2025-11-25",
+    "transport": "streamable-http",
+    "endpoint": "https://mcp.obd-vault.com/mcp",
+    "auth": {
+      "type": "oauth2",
+      "flow": "authorization_code_pkce_s256",
+      "scopes": [
+        "mcp:read"
+      ],
+      "issuer": "https://mcp.obd-vault.com"
+    }
+  },
+  "tools": [
+    {
+      "name": "list_vehicles",
+      "title": "List vehicles",
+      "description": "List vehicles owned by the authenticated user using an opaque cursor for pagination. Vehicles appear only after the user has scanned a car with the OBD Vault mobile app; when there are none, the result carries a notice explaining what the user has to do.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "List vehicles",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_vehicle_profile",
+      "title": "Get vehicle profile",
+      "description": "Get factual metadata and coverage for one vehicle. VIN is excluded unless explicitly requested.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "include_vin": {
+            "default": false,
+            "type": "boolean"
+          },
+          "vehicle_id": {
+            "description": "Optional vehicle ID. Defaults to the primary vehicle if omitted.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Get vehicle profile",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_latest_status",
+      "title": "Get latest vehicle status",
+      "description": "Get a comprehensive snapshot of the vehicle in a single call: latest diagnostic scan with key metrics (coolant, RPM, voltage), active/pending DTCs, the most recent completed driving trip (km, duration, fuel L/100km with its source: recorded, or the app's after-trip estimate with its coverage, speed, RPM), recent driving anomalies from the last 30 days, and active connection status.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "vehicle_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Get latest vehicle status",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "list_scan_sessions",
+      "title": "List scan sessions",
+      "description": "List diagnostic scan and driving sessions for a vehicle, including duration, distance, observation count, and trip indicators. Filterable by time or cursor. Vehicle ID defaults to primary vehicle.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Pagination cursor.",
+            "type": "string"
+          },
+          "from": {
+            "description": "Start timestamp (ISO-8601).",
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 200,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "to": {
+            "description": "End timestamp (ISO-8601).",
+            "type": "string"
+          },
+          "vehicle_id": {
+            "description": "Optional vehicle ID. Defaults to the user's primary vehicle if omitted.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "List scan sessions",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_scan_session",
+      "title": "Get scan session",
+      "description": "Get one bounded scan session including pre-computed telemetry metrics summary (peaks/averages for speed, coolant, voltage, RPM), diagnostic trouble codes, monitor readiness, the control units that answered a manufacturer dialogue (type, software and part numbers, their own fault memory), and sample observations.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "scan_session_id": {
+            "description": "The unique scan session identifier.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scan_session_id"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Get scan session",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_dtc_history",
+      "title": "Get DTC history",
+      "description": "List stored and pending diagnostic trouble code events for a vehicle, newest first, using an opaque cursor for pagination. Each event carries detected_at (start of the session that read it); code_summary gives each code's first and last sighting, so a code that has not been read for a long time is not mistaken for a current fault.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "vehicle_id": {
+            "description": "Optional vehicle ID. Defaults to the primary vehicle if omitted.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Get DTC history",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_dtc_context",
+      "title": "Get DTC context",
+      "description": "Return the Mode 02 freeze frame stored with a DTC and the readings within ±30s (or custom) of it. The window is centred on the freeze frame capture when one exists, otherwise on the start of the session that recorded the DTC (see target_time_source). Vehicle and DTC code default to the latest if omitted.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "dtc_code": {
+            "description": "Optional diagnostic trouble code (e.g. P0101). If omitted, defaults to the latest recorded DTC.",
+            "type": "string"
+          },
+          "timestamp": {
+            "description": "Optional ISO-8601 timestamp to center the analysis window around.",
+            "type": "string"
+          },
+          "vehicle_id": {
+            "description": "Optional vehicle ID. Defaults to the user's primary vehicle if omitted.",
+            "type": "string"
+          },
+          "window_seconds": {
+            "description": "Time window in seconds before and after the event (default 30s).",
+            "maximum": 120,
+            "minimum": 5,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Get DTC context",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "aggregate_observations",
+      "title": "Summarize telemetry observations",
+      "description": "Calculate statistical aggregates (min, max, mean, count) for an observed metric. Supports filtering by vehicle, metric, scan_session_id, or time range. Use this tool instead of pulling raw observation lists when looking for peaks, extremes, or averages. Only measured values are aggregated: the app's after-trip fuel estimates are left out (get_latest_status and get_scan_session report them, labelled).",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "bucket": {
+            "description": "Time bucket for aggregation. Default is \"day\", or \"all\" to aggregate the entire queried range or session into one summary.",
+            "enum": [
+              "all",
+              "hour",
+              "day",
+              "week",
+              "month"
+            ],
+            "type": "string"
+          },
+          "from": {
+            "description": "Optional start timestamp (ISO-8601).",
+            "type": "string"
+          },
+          "metric_key": {
+            "description": "The observed telemetry metric to aggregate (e.g. vehicle_speed, coolant_temperature, adapter_atrv_voltage, engine_rpm). Battery voltage measured at the adapter (ATRV) is adapter_atrv_voltage; control_module_voltage is the ECU's own supply reading (PID 42), which many cars do not report.",
+            "type": "string"
+          },
+          "scan_session_id": {
+            "description": "Optional scan session ID to aggregate observations for a specific trip or scan.",
+            "type": "string"
+          },
+          "timezone": {
+            "description": "IANA time zone that defines hour, day, week and month boundaries (e.g. Europe/Warsaw). Default UTC.",
+            "type": "string"
+          },
+          "to": {
+            "description": "Optional end timestamp (ISO-8601).",
+            "type": "string"
+          },
+          "vehicle_id": {
+            "description": "Vehicle ID. Optional if scan_session_id is provided.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metric_key"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Summarize telemetry observations",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_observations",
+      "title": "Get telemetry observations",
+      "description": "Return raw sensor timeseries observations (RPM, coolant, trims, voltages, speed). Sorted DESC (newest-first) by default; supports ASC. Use cursor for pagination. Ideal for waveform analysis or detailed moment-by-moment debugging.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "cursor": {
+            "description": "Pagination cursor from next_cursor.",
+            "type": "string"
+          },
+          "from": {
+            "description": "Start timestamp (ISO-8601).",
+            "type": "string"
+          },
+          "limit": {
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "metric_key": {
+            "description": "Filter by specific telemetry metric (e.g. vehicle_speed, engine_rpm, coolant_temperature, adapter_atrv_voltage). Battery voltage measured at the adapter (ATRV) is adapter_atrv_voltage; control_module_voltage is the ECU's own supply reading (PID 42), which many cars do not report.",
+            "type": "string"
+          },
+          "order": {
+            "description": "Chronological order: \"desc\" (newest first, default) or \"asc\" (oldest first).",
+            "enum": [
+              "asc",
+              "desc"
+            ],
+            "type": "string"
+          },
+          "scan_session_id": {
+            "description": "Filter observations by scan session ID.",
+            "type": "string"
+          },
+          "to": {
+            "description": "End timestamp (ISO-8601).",
+            "type": "string"
+          },
+          "vehicle_id": {
+            "description": "Vehicle ID. Optional if scan_session_id is provided.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Get telemetry observations",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "get_data_quality",
+      "title": "Get data quality",
+      "description": "Return factual coverage counts and observed metric keys for a vehicle.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "vehicle_id": {
+            "description": "Optional vehicle ID. Defaults to the primary vehicle if omitted.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Get data quality",
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "create_vehicle_export",
+      "title": "Create vehicle data export",
+      "description": "Create a bounded read-only JSON or CSV export for an owned vehicle, with up to 1,000 observations per session. Use get_observations with next_cursor to retrieve complete sensor histories.",
+      "inputSchema": {
+        "additionalProperties": false,
+        "properties": {
+          "format": {
+            "enum": [
+              "json",
+              "csv"
+            ],
+            "type": "string"
+          },
+          "vehicle_id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "vehicle_id"
+        ],
+        "type": "object"
+      },
+      "annotations": {
+        "title": "Create vehicle data export",
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "openWorldHint": false
+      },
+      "securitySchemes": [
+        {
+          "type": "oauth2",
+          "scopes": [
+            "mcp:read"
+          ]
+        }
+      ]
+    }
+  ]
+}
